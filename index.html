@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LYNN - คำนวณราคาประตู-หน้าต่าง</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- เพิ่ม Library สำหรับแปลงเป็น PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         /* === UI / Design Guideline === */
         :root {
@@ -164,6 +168,12 @@
         .text-right { text-align: right; }
         .text-center { text-align: center; }
 
+        /* PDF Printable Area Styling */
+        #printable-area {
+            background: white;
+            padding: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -177,7 +187,6 @@
             <p style="color: #666;">คำนวณราคาประตู-หน้าต่าง</p>
             <br>
             <button class="btn btn-primary" onclick="goToPage('page-customer')">สร้างใบเสนอราคาใหม่</button>
-            <button class="btn btn-secondary" onclick="alert('ฟีเจอร์นี้อยู่ระหว่างการพัฒนา')">ดูประวัติใบเสนอราคา</button>
         </div>
     </div>
 
@@ -233,48 +242,59 @@
 
     <!-- หน้า 4: สรุปผล -->
     <div id="page-summary" class="page">
-        <div style="text-align: center; margin-top: 10px;">
-            <h1 style="margin:0; font-size: 32px;">LYNN</h1>
-            <span style="font-size: 14px; color:#666;">ใบเสนอราคา (Quotation)</span>
-        </div>
-
-        <div style="background:#fafafa; padding:15px; border-radius:8px; border:1px solid #eee; margin-top:15px; font-size:14px;">
-            <div class="grid-2">
-                <div><strong>ลูกค้า:</strong> <span id="sum-custName">-</span></div>
-                <div class="text-right"><strong>วันที่:</strong> <span id="sum-date">-</span></div>
+        
+        <!-- ส่วนนี้จะถูกพิมพ์ลง PDF -->
+        <div id="printable-area">
+            <div style="text-align: center; margin-top: 10px;">
+                <h1 style="margin:0; font-size: 32px;">LYNN</h1>
+                <span style="font-size: 14px; color:#666;">ใบเสนอราคา (Quotation)</span>
             </div>
-            <div><strong>ที่อยู่:</strong> <span id="sum-custAddr">-</span></div>
-            <div><strong>โทร:</strong> <span id="sum-custPhone">-</span></div>
-            <hr style="margin:8px 0; border-top:1px dashed #ccc;">
-            <div><strong>ผู้เสนอราคา:</strong> <span id="sum-salesName">-</span> (<span id="sum-salesPhone">-</span>)</div>
-        </div>
 
-        <div style="overflow-x:auto;">
-            <table id="summary-table">
-                <thead>
-                    <tr>
-                        <th width="5%">#</th>
-                        <th width="40%">รายการ</th>
-                        <th width="20%">ขนาด(มม.)</th>
-                        <th width="10%">จำนวน</th>
-                        <th width="25%" class="text-right">รวม(บาท)</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+            <div style="background:#fafafa; padding:15px; border-radius:8px; border:1px solid #eee; margin-top:15px; font-size:14px;">
+                <div class="grid-2">
+                    <div><strong>ลูกค้า:</strong> <span id="sum-custName">-</span></div>
+                    <div class="text-right"><strong>วันที่:</strong> <span id="sum-date">-</span></div>
+                </div>
+                <div><strong>ที่อยู่:</strong> <span id="sum-custAddr">-</span></div>
+                <div><strong>โทร:</strong> <span id="sum-custPhone">-</span></div>
+                <hr style="margin:8px 0; border-top:1px dashed #ccc;">
+                <div><strong>ผู้เสนอราคา:</strong> <span id="sum-salesName">-</span> (<span id="sum-salesPhone">-</span>)</div>
+            </div>
 
-        <div style="padding:0 10px;">
-            <div class="summary-row"><span>ยอดรวมก่อนส่วนลด</span> <span id="final-subtotal">0.00</span></div>
-            <div class="summary-row"><span>ส่วนลด</span> <span id="final-discount">0.00</span></div>
-            <div class="summary-row"><span>ยอดหลังหักส่วนลด</span> <span id="final-after-disc">0.00</span></div>
-            <div class="summary-row"><span>ภาษีมูลค่าเพิ่ม 7%</span> <span id="final-vat">0.00</span></div>
-            <div class="summary-row total"><span>ยอดสุทธิ</span> <span id="final-grand-total">0.00</span></div>
-        </div>
+            <div style="overflow-x:auto;">
+                <table id="summary-table">
+                    <thead>
+                        <tr>
+                            <th width="5%">#</th>
+                            <th width="40%">รายการ</th>
+                            <th width="20%">ขนาด(มม.)</th>
+                            <th width="10%">จำนวน</th>
+                            <th width="25%" class="text-right">รวม(บาท)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
 
-        <button class="btn btn-primary" onclick="alert('บันทึกข้อมูลเรียบร้อย (Simulation)')">บันทึกใบเสนอราคา</button>
-        <button class="btn btn-secondary" onclick="goToPage('page-items')">แก้ไขรายการ</button>
-        <button class="btn btn-danger" style="width:100%; margin-top:15px;" onclick="if(confirm('สร้างใบใหม่? ข้อมูลเดิมจะหายไป')){ location.reload(); }">สร้างใบใหม่</button>
+            <div style="padding:0 10px; margin-top:10px;">
+                <div class="summary-row"><span>ยอดรวมก่อนส่วนลด</span> <span id="final-subtotal">0.00</span></div>
+                <div class="summary-row"><span>ส่วนลด</span> <span id="final-discount">0.00</span></div>
+                <div class="summary-row"><span>ยอดหลังหักส่วนลด</span> <span id="final-after-disc">0.00</span></div>
+                <div class="summary-row"><span>ภาษีมูลค่าเพิ่ม 7%</span> <span id="final-vat">0.00</span></div>
+                <div class="summary-row total"><span>ยอดสุทธิ</span> <span id="final-grand-total">0.00</span></div>
+            </div>
+            
+            <div style="text-align: center; margin-top:30px; font-size:12px; color:#999;">
+                เอกสารนี้สร้างโดยระบบอัตโนมัติของ LYNN
+            </div>
+        </div>
+        <!-- จบส่วนพิมพ์ PDF -->
+
+        <div style="margin-top:20px;">
+            <button class="btn btn-primary" onclick="generatePDF()">บันทึกเป็น PDF</button>
+            <button class="btn btn-secondary" onclick="goToPage('page-items')">แก้ไขรายการ</button>
+            <button class="btn btn-danger" style="width:100%; margin-top:15px;" onclick="if(confirm('สร้างใบใหม่? ข้อมูลเดิมจะหายไป')){ location.reload(); }">สร้างใบใหม่</button>
+        </div>
     </div>
 
 </div>
@@ -311,8 +331,6 @@
     function addNewItem() {
         idCounter++;
         const id = idCounter;
-
-        // Helper สร้าง options
         const mkOpt = (arr) => arr.map(v => `<option value="${v}">${v}</option>`).join('');
 
         const html = `
@@ -374,7 +392,6 @@
         
         items.push({ id: id, total: 0 });
         renumberItems();
-        // เรียกคำนวณเริ่มต้น (เพื่อให้ default value คำนวณทันทีถ้ามีขนาด)
         calc(id); 
     }
 
@@ -394,17 +411,14 @@
         });
     }
 
-    // --- Pricing Logic Engine (Core) ---
+    // --- Pricing Logic Engine ---
     function getPricePerSqm(model, type, glass) {
-        // กฎพิเศษ 1: ช่องแสง (Fixed Light) ใช้ราคาเดียวกันทุกรุ่น (All Models)
         if (type === "ช่องแสง") {
             if (glass === "ใส") return 3400;
             if (glass === "เขียวใสตัดแสงประหยัดพลังงาน") return 3700;
             if (glass === "นิรภัย") return 4500;
             return 0;
         }
-
-        // กฎ 2: แยกตามรุ่น -> ประเภทสินค้า -> กระจก
         if (model === "Pro(OK SERIES)") {
             if (type === "หน้าต่าง(WINDOW)") {
                 if (glass === "ใส") return 3000;
@@ -417,7 +431,6 @@
                 if (glass === "นิรภัย") return 4400;
             }
         }
-
         if (model === "Premium(XPLUS)") {
             if (type === "หน้าต่าง(WINDOW)") {
                 if (glass === "ใส") return 3500;
@@ -430,7 +443,6 @@
                 if (glass === "นิรภัย") return 5500;
             }
         }
-
         if (model === "Prestige(GRANDPANO)") {
             if (type === "หน้าต่าง(WINDOW)") {
                 if (glass === "ใส") return 4500;
@@ -443,9 +455,6 @@
                 if (glass === "นิรภัย") return 6500;
             }
         }
-
-        // หมายเหตุ: Platinum (PRIME) ไม่ได้ระบุราคาสำหรับประตู/หน้าต่างในโจทย์ 
-        // จะตกมาที่นี่ = 0
         return 0;
     }
 
@@ -458,29 +467,19 @@
         const type = document.getElementById(`type-${id}`).value;
         const glass = document.getElementById(`glass-${id}`).value;
 
-        // ค้นหาราคาต่อ ตร.ม.
         const unitPriceSqm = getPricePerSqm(model, type, glass);
-
-        // แจ้งเตือนถ้าไม่พบราคา (0 บาท)
         const warnEl = document.getElementById(`warn-${id}`);
         warnEl.style.display = (unitPriceSqm === 0) ? 'block' : 'none';
 
-        // คำนวณพื้นที่ (ตร.ม.)
         const area = (w/1000) * (h/1000);
-        
-        // ราคาต่อบาน = พื้นที่ * ราคาต่อตร.ม.
         const pricePerPiece = area * unitPriceSqm;
-        
-        // ราคารวม = ราคาต่อบาน * จำนวน
         const lineTotal = pricePerPiece * qty;
 
-        // แสดงผล
         document.getElementById(`txt-area-${id}`).innerText = area.toFixed(2);
         document.getElementById(`txt-sqm-price-${id}`).innerText = unitPriceSqm.toLocaleString();
         document.getElementById(`txt-unit-${id}`).innerText = fmt(pricePerPiece);
         document.getElementById(`txt-total-${id}`).innerText = fmt(lineTotal);
 
-        // อัปเดต Array
         const idx = items.findIndex(x => x.id === id);
         if(idx > -1) items[idx].total = lineTotal;
 
@@ -488,20 +487,12 @@
     }
 
     function calculateGrandTotal() {
-        // ยอดรวมก่อนส่วนลด
         const subtotal = items.reduce((sum, item) => sum + item.total, 0);
-        
-        // ส่วนลด
         let discount = parseFloat(document.getElementById('discount-input').value) || 0;
-        if(discount > subtotal) discount = subtotal; // ห้ามติดลบ
+        if(discount > subtotal) discount = subtotal;
 
-        // ยอดหลังหักส่วนลด
         const afterDisc = subtotal - discount;
-        
-        // VAT 7%
         const vat = afterDisc * 0.07;
-        
-        // ยอดสุทธิ
         const grand = afterDisc + vat;
 
         document.getElementById('live-subtotal').innerText = fmt(subtotal);
@@ -514,10 +505,9 @@
 
     function fmt(n) { return n.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2}); }
 
-    // --- Page 4: Summary ---
+    // --- Page 4: Summary & PDF ---
     function validatePage3() {
         let valid = true;
-        // เช็คว่ากรอกขนาดครบไหม
         items.forEach(i => {
             const w = document.getElementById(`w-${i.id}`).value;
             const h = document.getElementById(`h-${i.id}`).value;
@@ -525,13 +515,11 @@
         });
 
         if(!valid) { alert('กรุณากรอกขนาด กว้าง/สูง ให้ครบทุกรายการ'); return; }
-        
         renderSummary();
         goToPage('page-summary');
     }
 
     function renderSummary() {
-        // Header Info
         document.getElementById('sum-custName').innerText = document.getElementById('custName').value;
         document.getElementById('sum-custAddr').innerText = document.getElementById('custAddress').value;
         document.getElementById('sum-custPhone').innerText = document.getElementById('custPhone').value || '-';
@@ -541,7 +529,6 @@
         const d = new Date();
         document.getElementById('sum-date').innerText = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
 
-        // Table Rows
         const tbody = document.querySelector('#summary-table tbody');
         tbody.innerHTML = '';
         
@@ -555,8 +542,6 @@
             const w = document.getElementById(`w-${id}`).value;
             const h = document.getElementById(`h-${id}`).value;
             const qty = document.getElementById(`qty-${id}`).value;
-
-            // คำนวณซ้ำเพื่อการแสดงผล
             const priceSqm = getPricePerSqm(model, type, glass);
             const area = (w/1000) * (h/1000);
             const total = (area * priceSqm) * qty;
@@ -580,13 +565,40 @@
             tbody.innerHTML += row;
         });
 
-        // Totals
         const t = calculateGrandTotal();
         document.getElementById('final-subtotal').innerText = fmt(t.subtotal);
         document.getElementById('final-discount').innerText = fmt(t.discount);
         document.getElementById('final-after-disc').innerText = fmt(t.afterDisc);
         document.getElementById('final-vat').innerText = fmt(t.vat);
         document.getElementById('final-grand-total').innerText = fmt(t.grand);
+    }
+
+    // --- PDF Generation Function ---
+    function generatePDF() {
+        const element = document.getElementById('printable-area');
+        const customerName = document.getElementById('custName').value || 'Customer';
+        
+        // Configuration for html2pdf
+        const opt = {
+            margin:       0.3, // นิ้ว
+            filename:     `Quotation_${customerName}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 }, // เพิ่มความคมชัด
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+
+        // สั่งให้ปุ่มเปลี่ยนข้อความระหว่างโหลด
+        const btn = document.querySelector("button[onclick='generatePDF()']");
+        const originalText = btn.innerText;
+        btn.innerText = "กำลังสร้าง PDF...";
+        btn.disabled = true;
+
+        // Generate PDF
+        html2pdf().set(opt).from(element).save().then(() => {
+            // คืนค่าปุ่มเมื่อเสร็จ
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
     }
 </script>
 
