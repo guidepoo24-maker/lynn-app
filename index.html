@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LYNN v5.1 - คำนวณราคาประตู-หน้าต่าง</title>
+    <title>LYNN v5.2 - คำนวณราคาประตู-หน้าต่าง</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <!-- Library สำหรับแปลงเป็น PDF -->
@@ -169,15 +169,18 @@
         .text-center { text-align: center; }
         
         /* Style for PDF Elements */
-        tr { page-break-inside: avoid; } /* ห้ามตัดแถวตารางขาดครึ่ง */
-        .no-break { page-break-inside: avoid; } /* ห้ามตัดก้อนนี้ */
+        tr { page-break-inside: avoid; } 
+        .no-break { page-break-inside: avoid; }
 
-        /* PDF Printable Area Styling */
+        /* === แก้ไขจุดที่ 1: ปรับพื้นที่พิมพ์ PDF === */
         #printable-area {
             background: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            /* เอา border ออกเพื่อให้ PDF ดูสะอาด */
+            /* เพิ่ม Padding ขวาเป็น 30px เพื่อดันเนื้อหาเข้ามา ไม่ให้ตกขอบ */
+            padding: 20px 30px 20px 20px; 
+            margin: 0 auto;
+            /* บังคับความกว้างสูงสุด ให้พอดีกับ A4 */
+            max-width: 760px; 
+            box-sizing: border-box;
         }
         
         /* Loading Overlay */
@@ -608,7 +611,7 @@
         document.getElementById('final-grand-total').innerText = fmt(t.grand);
     }
 
-    // --- PDF Generation Function (Fixed: Full Data & Multi-page) ---
+    // --- PDF Generation Function (Fixed: Right Margin) ---
     function generatePDF() {
         const element = document.getElementById('printable-area');
         const customerName = document.getElementById('custName').value || 'Customer';
@@ -617,18 +620,15 @@
         loading.style.display = 'flex';
 
         const opt = {
-            margin:       [10, 10, 10, 10], // ขอบบน ขวา ล่าง ซ้าย (มิลลิเมตร)
+            margin:       [10, 10, 10, 10], 
             filename:     `Quotation_${customerName}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            
-            // สำคัญ! ตั้งค่าการตัดหน้า
             pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] },
-
             html2canvas:  { 
                 scale: 2,         
                 scrollY: 0,
                 useCORS: true,
-                windowWidth: 800  // บังคับกว้าง 800px เพื่อให้ Layout สวยเหมือนคอม
+                windowWidth: 800  // บังคับหน้าต่างกว้าง 800px (ซึ่งตัวตารางเราตั้ง Max ไว้ 760px แล้ว ยังไงก็ไม่ล้น)
             },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
