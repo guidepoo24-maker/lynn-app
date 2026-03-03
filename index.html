@@ -8,19 +8,19 @@
     <!-- ฟอนต์ภาษาไทย (Sarabun) -->
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     
-    <!-- Library สำหรับแปลง HTML เป็น PDF -->
+    <!-- html2pdf Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         /* ===============================
-           1. CSS & UI Design (Based on v5.2)
+           1. CORE STYLES & UI
            =============================== */
         :root {
             --primary-red: #C00000;
             --bg-white: #FFFFFF;
             --text-dark: #333333;
             --border-grey: #E0E0E0;
-            --bg-grey: #F8F9FA;
+            --bg-grey: #F4F6F8;
         }
 
         body {
@@ -29,8 +29,7 @@
             color: var(--text-dark);
             margin: 0;
             padding: 0;
-            line-height: 1.5;
-            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
@@ -38,543 +37,506 @@
             margin: 0 auto;
             padding: 20px;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
             position: relative;
         }
 
-        /* Page Transitions */
-        .page {
-            display: none;
-            animation: fadeIn 0.3s ease-out;
-            padding-bottom: 50px;
-        }
+        /* Page Navigation */
+        .page { display: none; animation: fadeIn 0.4s ease; padding-bottom: 80px; }
         .active { display: block; }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Headlines */
-        h1 { color: var(--primary-red); font-size: 28px; text-align: center; margin: 10px 0; font-weight: 700; }
-        h2 { font-size: 20px; border-left: 5px solid var(--primary-red); padding-left: 12px; margin: 20px 0 15px 0; color: var(--text-dark); }
-        .label { font-weight: 600; font-size: 14px; color: #555; margin-top: 15px; display: block; }
+        /* Typography */
+        h1 { color: var(--primary-red); font-weight: 700; margin: 0 0 10px 0; text-align: center; }
+        h2 { font-size: 18px; border-left: 4px solid var(--primary-red); padding-left: 10px; margin: 20px 0 15px; color: #444; }
+        .label { font-size: 14px; font-weight: 600; color: #666; margin-top: 12px; display: block; }
 
         /* Inputs */
         input, select, textarea {
-            width: 100%;
-            padding: 12px 15px;
-            margin-top: 5px;
-            border: 1px solid var(--border-grey);
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-            background-color: #FAFAFA;
-            font-family: 'Sarabun', sans-serif;
-            transition: all 0.2s;
+            width: 100%; padding: 12px; margin-top: 5px;
+            border: 1px solid #ddd; border-radius: 6px;
+            font-size: 16px; font-family: 'Sarabun', sans-serif;
+            box-sizing: border-box; background: #fff;
         }
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-red);
-            background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(192, 0, 0, 0.1);
-        }
+        input:focus, select:focus { border-color: var(--primary-red); outline: none; }
 
         /* Buttons */
         .btn {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-            text-align: center;
+            width: 100%; padding: 14px; margin-top: 20px;
+            border: none; border-radius: 8px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            text-align: center; transition: 0.2s;
         }
-        .btn-primary { background-color: var(--primary-red); color: white; box-shadow: 0 4px 10px rgba(192, 0, 0, 0.2); }
-        .btn-primary:active { transform: scale(0.98); }
-        .btn-secondary { background-color: white; color: #555; border: 1px solid #ccc; }
-        .btn-danger { background-color: #fff; color: #d32f2f; border: 1px solid #ffcdd2; width: auto; padding: 8px 12px; font-size: 14px; display: inline-block; margin-top: 0; }
+        .btn-primary { background: var(--primary-red); color: #fff; box-shadow: 0 4px 6px rgba(192,0,0,0.2); }
+        .btn-secondary { background: #fff; color: #555; border: 1px solid #ccc; }
+        .btn-danger { background: #fff; color: #d32f2f; border: 1px solid #ffcdd2; width: auto; padding: 6px 12px; font-size: 13px; float: right; margin-top: 0; }
 
-        /* Item Cards */
+        /* Item Card */
         .item-card {
-            background-color: var(--bg-grey);
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 20px;
-            border: 1px solid #eee;
-            position: relative;
+            background: var(--bg-grey); border: 1px solid #eee;
+            border-radius: 10px; padding: 15px; margin-bottom: 15px;
         }
-        .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e0e0e0; padding-bottom: 10px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .item-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px; margin-bottom: 10px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-        /* Live Summary Box (Page 3) */
+        /* Summary Footer (Floating/Sticky behavior if needed, but keeping it inline for stability) */
         .summary-box {
-            background: #fff;
-            border: 1px solid var(--primary-red);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
+            background: #fff; border: 1px solid var(--primary-red);
+            border-radius: 8px; padding: 15px; margin-top: 20px;
         }
-        .sum-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 15px; }
-        .sum-total { font-size: 22px; font-weight: bold; color: var(--primary-red); border-top: 2px solid #eee; padding-top: 10px; margin-top: 10px; }
+        .sum-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 15px; }
+        .sum-total { font-size: 20px; font-weight: bold; color: var(--primary-red); border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
 
-        /* PDF Printable Area (A4 Simulation) */
+        /* PDF Printable Styles */
         #printable-wrapper {
-            background: #525659; /* Gray background behind paper */
-            padding: 20px;
-            overflow-x: auto;
-            border-radius: 8px;
+            background: #666; padding: 20px; border-radius: 8px;
+            overflow-x: auto; margin-top: 20px;
         }
         #printable-area {
-            background: white;
-            width: 750px; /* Fixed width for PDF generation consistency */
-            min-height: 1000px;
-            margin: 0 auto;
-            padding: 40px;
-            box-sizing: border-box;
-            position: relative;
-            /* Important for html2pdf */
+            background: #fff; width: 750px; min-height: 1000px;
+            margin: 0 auto; padding: 40px; box-sizing: border-box;
         }
-
-        /* PDF Table Styles */
-        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        .pdf-table th { background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; padding: 10px; text-align: center; }
-        .pdf-table td { border: 1px solid #ddd; padding: 10px; vertical-align: top; }
+        .pdf-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
+        .pdf-table th { background: #f0f0f0; border: 1px solid #ccc; padding: 8px; text-align: center; font-weight: bold; }
+        .pdf-table td { border: 1px solid #ccc; padding: 8px; vertical-align: top; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
-        
-        /* Helper classes for PDF page breaks */
-        .no-break { page-break-inside: avoid; }
-        tr { page-break-inside: avoid; }
+        .no-break { page-break-inside: avoid; } /* Prevents cutting inside rows */
 
-        /* Loading Overlay */
+        /* Loading */
         #loading {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top:0; left:0; width:100%; height:100%;
             background: rgba(255,255,255,0.9); z-index: 999;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
+            display: none; justify-content: center; align-items: center; flex-direction: column;
         }
         .spinner {
-            border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-red);
-            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
+            width: 40px; height: 40px; border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-red); border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
     </style>
 </head>
 <body>
 
-<!-- Loading -->
-<div id="loading">
-    <div class="spinner"></div>
-    <p style="margin-top:10px; font-weight:600; color:var(--primary-red);">กำลังสร้างไฟล์ PDF...</p>
-</div>
-
-<div class="container">
-
-    <!-- Page 1: Welcome -->
-    <div id="page-1" class="page active">
-        <div style="text-align: center; margin-top: 30vh;">
-            <h1 style="font-size: 40px; margin-bottom: 5px;">LYNN</h1>
-            <p style="color: #666; font-size: 18px;">คำนวณราคาประตู-หน้าต่าง</p>
-            <div style="width: 60px; height: 4px; background: var(--primary-red); margin: 20px auto;"></div>
-            <button class="btn btn-primary" onclick="goToPage(2)">สร้างใบเสนอราคาใหม่</button>
-        </div>
+    <!-- Loading Overlay -->
+    <div id="loading">
+        <div class="spinner"></div>
+        <p style="color:var(--primary-red); margin-top:10px; font-weight:600;">กำลังสร้างไฟล์ PDF...</p>
     </div>
 
-    <!-- Page 2: Customer Info -->
-    <div id="page-2" class="page">
-        <h1>LYNN</h1>
-        <h2>ข้อมูลลูกค้าและเซลล์</h2>
+    <div class="container">
         
-        <label class="label">ชื่อลูกค้า / เจ้าของบ้าน *</label>
-        <input type="text" id="inp-cust-name" placeholder="ระบุชื่อลูกค้า">
-
-        <label class="label">ที่ตั้งงาน / โครงการ</label>
-        <textarea id="inp-cust-addr" rows="3" placeholder="ระบุที่อยู่หน้างาน"></textarea>
-
-        <label class="label">เบอร์โทรลูกค้า</label>
-        <input type="tel" id="inp-cust-phone" placeholder="08x-xxx-xxxx">
-
-        <hr style="margin: 25px 0; border: 0; border-top: 1px dashed #ccc;">
-
-        <label class="label">ชื่อเซลล์ผู้ดูแล *</label>
-        <input type="text" id="inp-sale-name" placeholder="ระบุชื่อเซลล์">
-
-        <label class="label">เบอร์โทรเซลล์</label>
-        <input type="tel" id="inp-sale-phone" placeholder="08x-xxx-xxxx">
-
-        <button class="btn btn-primary" onclick="validatePage2()">ถัดไป: เพิ่มรายการสินค้า</button>
-        <button class="btn btn-secondary" onclick="goToPage(1)">ย้อนกลับ</button>
-    </div>
-
-    <!-- Page 3: Add Items -->
-    <div id="page-3" class="page">
-        <h1>รายการสินค้า</h1>
-        
-        <div id="items-wrapper"></div>
-
-        <button class="btn btn-secondary" style="border: 2px dashed var(--primary-red); color: var(--primary-red);" onclick="addItem()">
-            + เพิ่มบานใหม่
-        </button>
-
-        <div class="summary-box">
-            <div class="sum-row"><span>ยอดรวมก่อนส่วนลด:</span> <span id="live-subtotal">0.00</span></div>
-            
-            <label class="label" style="margin-top:10px;">ส่วนลดท้ายบิล (บาท)</label>
-            <input type="number" id="inp-discount" value="0" placeholder="0" oninput="calculateTotal()" style="font-weight:bold; color:var(--primary-red);">
-            
-            <div class="sum-row" style="margin-top:10px;"><span>ยอดหลังหักส่วนลด:</span> <span id="live-after-disc">0.00</span></div>
-            <div class="sum-row"><span>VAT 7%:</span> <span id="live-vat">0.00</span></div>
-            <div class="sum-total"><span>ยอดสุทธิ:</span> <span id="live-grand">0.00</span></div>
-        </div>
-
-        <button class="btn btn-primary" onclick="validatePage3()">ถัดไป: สรุปรายละเอียด</button>
-        <button class="btn btn-secondary" onclick="goToPage(2)">ย้อนกลับ</button>
-    </div>
-
-    <!-- Page 4: Summary & PDF -->
-    <div id="page-4" class="page">
-        <h2 style="margin-top:0;">ตัวอย่างใบเสนอราคา</h2>
-        <p style="font-size:14px; color:#666; margin-bottom:10px;">ตรวจสอบความถูกต้องก่อนบันทึก</p>
-
-        <!-- Area for PDF Generation -->
-        <div id="printable-wrapper">
-            <div id="printable-area">
-                <!-- Header -->
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <h1 style="margin:0; text-align:left; font-size:36px;">LYNN</h1>
-                        <p style="margin:0; font-size:14px; color:#666;">ใบเสนอราคา (Quotation)</p>
-                    </div>
-                    <div style="text-align:right;">
-                        <div style="font-size:14px;"><strong>วันที่:</strong> <span id="pdf-date">-</span></div>
-                    </div>
-                </div>
-
-                <hr style="border:1px solid #eee; margin:20px 0;">
-
-                <!-- Info Grid -->
-                <div class="grid-2 no-break" style="font-size:14px; margin-bottom:20px;">
-                    <div style="background:#f9f9f9; padding:15px; border-radius:8px;">
-                        <strong style="color:var(--primary-red);">ลูกค้า</strong><br>
-                        <span id="pdf-cust-name">-</span><br>
-                        <span id="pdf-cust-addr" style="font-size:13px; color:#555;">-</span><br>
-                        โทร: <span id="pdf-cust-phone">-</span>
-                    </div>
-                    <div style="background:#f9f9f9; padding:15px; border-radius:8px;">
-                        <strong style="color:var(--primary-red);">ผู้เสนอราคา</strong><br>
-                        <span id="pdf-sale-name">-</span><br>
-                        โทร: <span id="pdf-sale-phone">-</span>
-                    </div>
-                </div>
-
-                <!-- Table -->
-                <table class="pdf-table">
-                    <thead>
-                        <tr>
-                            <th style="width:5%">#</th>
-                            <th style="width:40%">รายการ</th>
-                            <th style="width:20%">ขนาด (มม.)</th>
-                            <th style="width:10%">จำนวน</th>
-                            <th style="width:25%" class="text-right">รวม (บาท)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pdf-table-body">
-                        <!-- Rows rendered by JS -->
-                    </tbody>
-                </table>
-
-                <!-- Footer Summary -->
-                <div class="no-break" style="margin-top:20px; display:flex; justify-content:flex-end;">
-                    <div style="width:250px;">
-                        <div class="sum-row"><span>รวมเป็นเงิน</span> <span id="pdf-subtotal">0.00</span></div>
-                        <div class="sum-row"><span>ส่วนลด</span> <span id="pdf-discount">0.00</span></div>
-                        <div class="sum-row" style="border-bottom:1px solid #ddd; padding-bottom:5px;"><span>หลังหักส่วนลด</span> <span id="pdf-after-disc">0.00</span></div>
-                        <div class="sum-row" style="margin-top:5px;"><span>VAT 7%</span> <span id="pdf-vat">0.00</span></div>
-                        <div class="sum-row total" style="font-weight:bold; color:var(--primary-red); font-size:18px; margin-top:10px;">
-                            <span>ยอดสุทธิ</span> <span id="pdf-grand">0.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer Note -->
-                <div class="no-break" style="margin-top:40px; font-size:12px; color:#999; text-align:center; border-top:1px solid #eee; padding-top:10px;">
-                    เอกสารนี้สร้างโดยระบบอัตโนมัติของ LYNN Application<br>
-                    ราคานี้ยังไม่รวมค่าติดตั้งและค่าขนส่ง (เว้นแต่ระบุไว้)
-                </div>
+        <!-- PAGE 1: Welcome -->
+        <div id="page-1" class="page active">
+            <div style="text-align:center; padding-top:30vh;">
+                <h1 style="font-size:48px;">LYNN</h1>
+                <p style="color:#666; font-size:18px;">ระบบคำนวณราคาประตู-หน้าต่าง (v5.3)</p>
+                <div style="height:4px; width:60px; background:var(--primary-red); margin:20px auto;"></div>
+                <button class="btn btn-primary" onclick="goToPage(2)">เริ่มสร้างใบเสนอราคา</button>
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div style="margin-top:20px;">
-            <button class="btn btn-primary" onclick="generatePDF()">บันทึกเป็น PDF (ดาวน์โหลด)</button>
-            <button class="btn btn-secondary" onclick="goToPage(3)">แก้ไขรายการ</button>
-            <button class="btn btn-danger" style="width:100%; margin-top:15px;" onclick="if(confirm('ข้อมูลทั้งหมดจะถูกล้าง เริ่มใหม่?')) location.reload()">เริ่มใบเสนอราคาใหม่</button>
-        </div>
-    </div>
+        <!-- PAGE 2: Customer Info -->
+        <div id="page-2" class="page">
+            <h1>LYNN</h1>
+            <h2>ข้อมูลลูกค้าและเซลล์</h2>
+            
+            <label class="label">ชื่อลูกค้า / เจ้าของบ้าน *</label>
+            <input type="text" id="inp-cust-name" placeholder="ระบุชื่อลูกค้า">
+            
+            <label class="label">ที่ตั้งงาน / โครงการ</label>
+            <textarea id="inp-cust-addr" rows="2" placeholder="ระบุที่อยู่หน้างาน"></textarea>
+            
+            <label class="label">เบอร์โทรลูกค้า</label>
+            <input type="tel" id="inp-cust-phone" placeholder="08x-xxx-xxxx">
 
-</div>
+            <div style="border-top:1px dashed #ccc; margin:20px 0;"></div>
+
+            <label class="label">ชื่อเซลล์ผู้ดูแล</label>
+            <input type="text" id="inp-sale-name" placeholder="ระบุชื่อเซลล์">
+            
+            <label class="label">เบอร์โทรเซลล์</label>
+            <input type="tel" id="inp-sale-phone" placeholder="08x-xxx-xxxx">
+
+            <div class="grid-2" style="margin-top:20px;">
+                <button class="btn btn-secondary" style="margin-top:0;" onclick="goToPage(1)">ย้อนกลับ</button>
+                <button class="btn btn-primary" style="margin-top:0;" onclick="validatePage2()">ถัดไป</button>
+            </div>
+        </div>
+
+        <!-- PAGE 3: Add Items -->
+        <div id="page-3" class="page">
+            <h2 style="margin-top:0;">รายการสินค้า</h2>
+            <div id="items-container"></div>
+            
+            <button class="btn btn-secondary" onclick="addItem()" style="border:2px dashed var(--primary-red); color:var(--primary-red); font-weight:bold;">+ เพิ่มรายการสินค้า</button>
+
+            <!-- Live Summary -->
+            <div class="summary-box">
+                <div class="sum-row"><span>รวมเป็นเงิน (Subtotal)</span> <span id="live-subtotal">0.00</span></div>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; margin:10px 0;">
+                    <span style="font-weight:600; color:#555;">ส่วนลดท้ายบิล (บาท)</span>
+                    <input type="number" id="inp-discount" value="0" style="width:120px; text-align:right; font-weight:bold; color:var(--primary-red);" oninput="recalcTotal()">
+                </div>
+                
+                <div class="sum-row"><span>หลังหักส่วนลด</span> <span id="live-after-disc">0.00</span></div>
+                <div class="sum-row"><span>VAT 7%</span> <span id="live-vat">0.00</span></div>
+                <div class="sum-total"><span>ยอดสุทธิ</span> <span id="live-grand">0.00</span></div>
+            </div>
+
+            <div class="grid-2" style="margin-top:20px;">
+                <button class="btn btn-secondary" style="margin-top:0;" onclick="goToPage(2)">ย้อนกลับ</button>
+                <button class="btn btn-primary" style="margin-top:0;" onclick="validatePage3()">สรุปใบเสนอราคา</button>
+            </div>
+        </div>
+
+        <!-- PAGE 4: PDF Preview -->
+        <div id="page-4" class="page">
+            <h2 style="margin-top:0;">ตรวจสอบความถูกต้อง</h2>
+            <p style="font-size:14px; color:#666;">กดปุ่ม "บันทึกเป็น PDF" ด้านล่างเพื่อดาวน์โหลด</p>
+
+            <!-- PDF Area -->
+            <div id="printable-wrapper">
+                <div id="printable-area">
+                    <!-- PDF Header -->
+                    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                        <div>
+                            <h1 style="text-align:left; font-size:32px; margin:0;">LYNN</h1>
+                            <div style="font-size:14px; color:#666;">ใบเสนอราคา (Quotation)</div>
+                        </div>
+                        <div style="text-align:right; font-size:14px;">
+                            <strong>วันที่:</strong> <span id="pdf-date">-</span>
+                        </div>
+                    </div>
+
+                    <div style="border-top:2px solid var(--primary-red); margin-bottom:20px;"></div>
+
+                    <!-- Customer / Sale Info -->
+                    <div class="grid-2 no-break" style="margin-bottom:20px; font-size:14px;">
+                        <div style="background:#f9f9f9; padding:15px; border-radius:6px;">
+                            <strong style="color:var(--primary-red);">ลูกค้า (Customer)</strong><br>
+                            <span id="pdf-cust-name">-</span><br>
+                            <span id="pdf-cust-addr" style="font-size:13px; color:#555;">-</span><br>
+                            โทร: <span id="pdf-cust-phone">-</span>
+                        </div>
+                        <div style="background:#f9f9f9; padding:15px; border-radius:6px;">
+                            <strong style="color:var(--primary-red);">ผู้ขาย (Sales)</strong><br>
+                            <span id="pdf-sale-name">-</span><br>
+                            โทร: <span id="pdf-sale-phone">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <table class="pdf-table">
+                        <thead>
+                            <tr>
+                                <th style="width:5%">#</th>
+                                <th style="width:40%">รายละเอียดสินค้า</th>
+                                <th style="width:20%">ขนาด (มม.)</th>
+                                <th style="width:10%">จำนวน</th>
+                                <th style="width:25%" class="text-right">รวม (บาท)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pdf-tbody"></tbody>
+                    </table>
+
+                    <!-- Footer Summary -->
+                    <div class="no-break" style="margin-top:20px; display:flex; justify-content:flex-end;">
+                        <div style="width:250px; font-size:14px;">
+                            <div class="sum-row"><span>รวมเป็นเงิน</span> <span id="pdf-subtotal">0.00</span></div>
+                            <div class="sum-row"><span>ส่วนลด</span> <span id="pdf-discount">0.00</span></div>
+                            <div class="sum-row" style="border-bottom:1px solid #ddd; padding-bottom:5px;"><span>หลังหักส่วนลด</span> <span id="pdf-after-disc">0.00</span></div>
+                            <div class="sum-row" style="margin-top:5px;"><span>VAT 7%</span> <span id="pdf-vat">0.00</span></div>
+                            <div class="sum-row total" style="font-weight:bold; color:var(--primary-red); font-size:18px; margin-top:10px;">
+                                <span>ยอดสุทธิ</span> <span id="pdf-grand">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="no-break" style="margin-top:40px; border-top:1px solid #eee; padding-top:10px; text-align:center; font-size:12px; color:#999;">
+                        เอกสารนี้สร้างโดยระบบอัตโนมัติ LYNN Application<br>ราคาอาจมีการเปลี่ยนแปลง โปรดยืนยันกับพนักงานขายอีกครั้ง
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="generatePDF()">บันทึกเป็น PDF (ดาวน์โหลด)</button>
+            <button class="btn btn-secondary" onclick="goToPage(3)">กลับไปแก้ไขรายการ</button>
+        </div>
+
+    </div>
 
 <script>
     /* ===============================
-       2. Data Configuration (v5.3 Logic)
+       2. DATA & LOGIC (V5.3 Requirement)
        =============================== */
-    const DATA = {
+    
+    // Dropdown Options
+    const OPT = {
         products: ["ประตู(DOOR)", "หน้าต่าง(WINDOW)", "ช่องแสง"],
         styles: ["บานเลื่อนสลับ", "บานเปิด", "บานกระทุ้ง"],
-        models: ["Pro(OK SERIES)", "Premium(XPLUS)", "Platinum(PRIME)", "Prestige(GRANDPANO)"],
+        models: ["Platinum(PRIME)", "Prestige(GRANDPANO)"],
         colors: ["ขาวพาวเดอร์โค้ท", "ดำพาวเดอร์โค้ท", "เทาพาวเดอร์โค้ท"],
         glass: ["ใส", "เขียวใสตัดแสงประหยัดพลังงาน", "นิรภัย"]
     };
 
-    let items = []; // Store items here
+    let items = []; // Store user items
 
-    // --- Pricing Engine (สูตรคำนวณตามโจทย์) ---
-    function getBasePricePerSqm(model, type, glass) {
-        // Model: Pro
-        if (model.includes("Pro")) {
-            if (type.includes("หน้าต่าง")) {
-                if (glass === "ใส") return 3000;
-                if (glass.includes("เขียว")) return 3300;
+    /* 
+     * PRICING LOGIC ENGINE
+     * Based on Requirements: Model -> Type -> Style -> Glass
+     */
+    function getBasePricePerSqm(model, type, style, glass) {
+        
+        // --- 1. MODEL: PLATINUM (PRIME) ---
+        if (model.includes("Platinum")) {
+            
+            // 1.1 ช่องแสง (Fixed Light) - ไม่สน Style
+            if (type.includes("ช่องแสง")) {
+                if (glass === "ใส") return 2500;
+                if (glass.includes("เขียว")) return 2800;
                 if (glass === "นิรภัย") return 3900;
             }
-            if (type.includes("ประตู")) {
-                if (glass === "ใส") return 3400;
-                if (glass.includes("เขียว")) return 3700;
-                if (glass === "นิรภัย") return 4400;
-            }
-        }
-        // Model: Premium
-        else if (model.includes("Premium")) {
+
+            // 1.2 หน้าต่าง (Window)
             if (type.includes("หน้าต่าง")) {
-                if (glass === "ใส") return 3500;
-                if (glass.includes("เขียว")) return 3900;
-                if (glass === "นิรภัย") return 4800;
+                if (style === "บานเลื่อนสลับ") {
+                    if (glass === "ใส") return 3500;
+                    if (glass.includes("เขียว")) return 3800;
+                    if (glass === "นิรภัย") return 5300;
+                }
+                if (style === "บานกระทุ้ง") {
+                    if (glass === "ใส") return 8000;
+                    if (glass.includes("เขียว")) return 8300;
+                    if (glass === "นิรภัย") return 9300;
+                }
+                if (style === "บานเปิด") {
+                    if (glass === "ใส") return 7000;
+                    if (glass.includes("เขียว")) return 7300;
+                    if (glass === "นิรภัย") return 8300;
+                }
             }
+
+            // 1.3 ประตู (Door)
             if (type.includes("ประตู")) {
-                if (glass === "ใส") return 4000;
-                if (glass.includes("เขียว")) return 4900;
-                if (glass === "นิรภัย") return 5500;
+                if (style === "บานเลื่อนสลับ") {
+                    if (glass === "ใส") return 3500;
+                    if (glass.includes("เขียว")) return 3800;
+                    if (glass === "นิรภัย") return 5300;
+                }
+                // Mapping Dropdown "บานเปิด" -> Requirement "ประตูบานเลื่อนเปิด" (or Swing Open)
+                if (style === "บานเปิด" || style.includes("เลื่อนเปิด")) {
+                    if (glass === "ใส") return 5500;
+                    if (glass.includes("เขียว")) return 5800;
+                    if (glass === "นิรภัย") return 6800;
+                }
             }
         }
-        // Model: Platinum
-        else if (model.includes("Platinum")) {
-            if (type.includes("หน้าต่าง")) {
-                if (glass === "ใส") return 4500;
-                if (glass.includes("เขียว")) return 4900;
-                if (glass === "นิรภัย") return 5800;
-            }
-            if (type.includes("ประตู")) {
-                if (glass === "ใส") return 5000;
-                if (glass.includes("เขียว")) return 5900;
-                if (glass === "นิรภัย") return 6800;
-            }
-        }
-        // Model: Prestige
+
+        // --- 2. MODEL: PRESTIGE (GRANDPANO) ---
         else if (model.includes("Prestige")) {
-            if (type.includes("หน้าต่าง")) {
-                if (glass === "ใส") return 5500;
-                if (glass.includes("เขียว")) return 5900;
-                if (glass === "นิรภัย") return 6600;
+            
+            // 2.1 ช่องแสง
+            if (type.includes("ช่องแสง")) {
+                if (glass === "ใส") return 3000;
+                if (glass.includes("เขียว")) return 3100;
+                if (glass === "นิรภัย") return 4500;
             }
+
+            // 2.2 หน้าต่าง
+            if (type.includes("หน้าต่าง")) {
+                if (style === "บานเลื่อนสลับ") {
+                    if (glass === "ใส") return 3900;
+                    if (glass.includes("เขียว")) return 4200;
+                    if (glass === "นิรภัย") return 5700;
+                }
+                if (style === "บานกระทุ้ง") {
+                    if (glass === "ใส") return 8500;
+                    if (glass.includes("เขียว")) return 8800;
+                    if (glass === "นิรภัย") return 9900;
+                }
+                if (style === "บานเปิด") {
+                    if (glass === "ใส") return 7500;
+                    if (glass.includes("เขียว")) return 8000;
+                    if (glass === "นิรภัย") return 9300;
+                }
+            }
+
+            // 2.3 ประตู
             if (type.includes("ประตู")) {
-                if (glass === "ใส") return 6000;
-                if (glass.includes("เขียว")) return 5900;
-                if (glass === "นิรภัย") return 6800;
+                if (style === "บานเลื่อนสลับ") {
+                    if (glass === "ใส") return 4000;
+                    if (glass.includes("เขียว")) return 4300;
+                    if (glass === "นิรภัย") return 5800;
+                }
+                if (style === "บานเปิด" || style.includes("เลื่อนเปิด")) {
+                    if (glass === "ใส") return 6000;
+                    if (glass.includes("เขียว")) return 6300;
+                    if (glass === "นิรภัย") return 7700;
+                }
             }
         }
-        
-        return 0; // Default fallback if no match (e.g. ช่องแสง)
+
+        return 0; // Return 0 if not found
     }
 
     function getSurcharge(color) {
-        // บวกเพิ่ม 200 หากเป็นสีดำหรือเทา
-        if (color.includes("ดำ") || color.includes("เทา")) {
-            return 200;
-        }
+        // Black or Grey add 200 THB/Sqm
+        if (color.includes("ดำ") || color.includes("เทา")) return 200;
         return 0;
     }
 
     /* ===============================
-       3. Application Logic
+       3. APP CONTROLLER
        =============================== */
-    
-    // Navigation
-    function goToPage(pageNum) {
+
+    window.onload = function() { addItem(); }; // Start with 1 item
+
+    function goToPage(pid) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(`page-${pageNum}`).classList.add('active');
+        document.getElementById('page-' + pid).classList.add('active');
         window.scrollTo(0,0);
     }
 
-    // Initialize
-    window.onload = function() {
-        addItem(); // Start with 1 item
-    };
-
-    // Validation
     function validatePage2() {
-        const name = document.getElementById('inp-cust-name').value.trim();
-        const sale = document.getElementById('inp-sale-name').value.trim();
-        if(!name || !sale) { alert("กรุณากรอกชื่อลูกค้า และชื่อเซลล์"); return; }
+        if(!document.getElementById('inp-cust-name').value) { alert('กรุณากรอกชื่อลูกค้า'); return; }
         goToPage(3);
     }
 
     function validatePage3() {
-        // Check inputs
-        let valid = true;
-        items.forEach(item => {
-            const w = document.getElementById(`w-${item.id}`).value;
-            const h = document.getElementById(`h-${item.id}`).value;
-            if(!w || !h || w <= 0 || h <= 0) valid = false;
+        let error = false;
+        items.forEach(i => {
+            const w = document.getElementById(`w-${i.id}`).value;
+            const h = document.getElementById(`h-${i.id}`).value;
+            if(!w || !h || w <=0 || h <= 0) error = true;
         });
-
-        if(!valid) { alert("กรุณากรอกขนาด กว้าง x สูง ให้ครบทุกรายการ"); return; }
+        if(error) { alert('กรุณากรอกขนาด (กว้าง x สูง) ให้ครบถ้วน'); return; }
         
-        renderSummaryPDF();
+        renderPDFPreview();
         goToPage(4);
     }
 
-    // Helper: Create Dropdown Options
-    const createOptions = (arr) => arr.map(v => `<option value="${v}">${v}</option>`).join('');
-
-    // Item Management
+    // --- Item Management ---
     function addItem() {
-        const id = Date.now(); // Unique ID
+        const id = Date.now();
         items.push({ id: id });
-
+        
         const div = document.createElement('div');
         div.className = 'item-card';
         div.id = `card-${id}`;
         div.innerHTML = `
-            <div class="item-header">
-                <span style="font-weight:bold; color:var(--text-dark);">รายการสินค้า</span>
+            <div class="item-head">
+                <span style="font-weight:600; color:#555;">รายการที่ ${items.length}</span>
                 ${items.length > 1 ? `<button class="btn-danger" onclick="removeItem(${id})">ลบ</button>` : ''}
             </div>
+            
+            <label class="label">รุ่นสินค้า (Model)</label>
+            <select id="model-${id}" onchange="calc(${id})">${genOpt(OPT.models)}</select>
 
             <div class="grid-2">
                 <div>
                     <label class="label">ประเภท</label>
-                    <select id="type-${id}" onchange="calcItem(${id})">${createOptions(DATA.products)}</select>
+                    <select id="type-${id}" onchange="calc(${id})">${genOpt(OPT.products)}</select>
                 </div>
                 <div>
                     <label class="label">รูปแบบ</label>
-                    <select id="style-${id}">${createOptions(DATA.styles)}</select>
+                    <select id="style-${id}" onchange="calc(${id})">${genOpt(OPT.styles)}</select>
                 </div>
             </div>
-
-            <label class="label">รุ่นสินค้า (Model)</label>
-            <select id="model-${id}" onchange="calcItem(${id})">${createOptions(DATA.models)}</select>
-
-            <label class="label">สีสินค้า (Color)</label>
-            <select id="color-${id}" onchange="calcItem(${id})">${createOptions(DATA.colors)}</select>
-
-            <label class="label">ประเภทกระจก</label>
-            <select id="glass-${id}" onchange="calcItem(${id})">${createOptions(DATA.glass)}</select>
 
             <div class="grid-2">
                 <div>
-                    <label class="label">กว้าง (มม.)</label>
-                    <input type="number" id="w-${id}" placeholder="0" oninput="calcItem(${id})">
+                    <label class="label">สีสินค้า</label>
+                    <select id="color-${id}" onchange="calc(${id})">${genOpt(OPT.colors)}</select>
                 </div>
                 <div>
-                    <label class="label">สูง (มม.)</label>
-                    <input type="number" id="h-${id}" placeholder="0" oninput="calcItem(${id})">
+                    <label class="label">กระจก</label>
+                    <select id="glass-${id}" onchange="calc(${id})">${genOpt(OPT.glass)}</select>
                 </div>
+            </div>
+
+            <div class="grid-2">
+                <div><label class="label">กว้าง (มม.)</label><input type="number" id="w-${id}" placeholder="0" oninput="calc(${id})"></div>
+                <div><label class="label">สูง (มม.)</label><input type="number" id="h-${id}" placeholder="0" oninput="calc(${id})"></div>
             </div>
 
             <label class="label">จำนวน (บาน)</label>
-            <input type="number" id="qty-${id}" value="1" min="1" oninput="calcItem(${id})">
+            <input type="number" id="qty-${id}" value="1" min="1" oninput="calc(${id})">
 
-            <div style="background:#fff; padding:10px; margin-top:10px; border-radius:6px; border:1px dashed #ccc; font-size:14px;">
-                <div class="sum-row"><span>พื้นที่ต่อบาน:</span> <span id="disp-area-${id}">0.00 ตร.ม.</span></div>
-                <div class="sum-row"><span>ราคาตั้งต้น/ตร.ม.:</span> <span id="disp-base-${id}">0</span></div>
-                <div class="sum-row"><span>บวกเพิ่มค่าสี:</span> <span id="disp-sur-${id}" style="color:var(--primary-red);">0</span></div>
-                <div class="sum-row" style="font-weight:bold; border-top:1px solid #eee; padding-top:5px;">
-                    <span>รวมรายการนี้:</span> <span id="disp-total-${id}">0.00</span>
+            <div style="margin-top:10px; padding:10px; background:#fff; border:1px dashed #ccc; border-radius:6px; font-size:13px;">
+                <div class="sum-row"><span>พื้นที่:</span> <span id="txt-area-${id}">0.00 ตร.ม.</span></div>
+                <div class="sum-row"><span>ราคาตั้งต้น/ตร.ม.:</span> <span id="txt-base-${id}">0</span></div>
+                <div class="sum-row"><span>ค่าสีเพิ่ม/ตร.ม.:</span> <span id="txt-surch-${id}" style="color:var(--primary-red);">0</span></div>
+                <div class="sum-row" style="font-weight:bold; border-top:1px solid #eee; margin-top:5px; padding-top:5px;">
+                    <span>รวมรายการนี้:</span> <span id="txt-total-${id}">0.00</span>
                 </div>
             </div>
         `;
-        document.getElementById('items-wrapper').appendChild(div);
-        calcItem(id); // Initial calc
+        document.getElementById('items-container').appendChild(div);
+        calc(id); // Initial calc
     }
 
     function removeItem(id) {
-        items = items.filter(i => i.id !== id);
+        items = items.filter(x => x.id !== id);
         document.getElementById(`card-${id}`).remove();
-        calculateTotal();
+        recalcTotal();
     }
 
-    // Calculation Logic
-    function calcItem(id) {
-        // Get Inputs
+    function genOpt(arr) { return arr.map(x => `<option value="${x}">${x}</option>`).join(''); }
+
+    // --- Calculation ---
+    function calc(id) {
+        // Inputs
         const model = document.getElementById(`model-${id}`).value;
         const type = document.getElementById(`type-${id}`).value;
-        const glass = document.getElementById(`glass-${id}`).value;
+        const style = document.getElementById(`style-${id}`).value;
         const color = document.getElementById(`color-${id}`).value;
-        
-        let w = parseFloat(document.getElementById(`w-${id}`).value) || 0;
-        let h = parseFloat(document.getElementById(`h-${id}`).value) || 0;
-        let qty = parseFloat(document.getElementById(`qty-${id}`).value) || 0;
-        
-        // 1. Convert mm -> meter
-        let w_m = w / 1000;
-        let h_m = h / 1000;
-        
-        // 2. Area
-        let area = w_m * h_m;
-        
-        // 3. Get Base Price
-        let basePrice = getBasePricePerSqm(model, type, glass);
-        
-        // 4. Get Surcharge
-        let surcharge = getSurcharge(color);
-        
-        // 5. Price per piece (Base + Surcharge) * Area
-        // หมายเหตุ: สูตรคำนวณตามโจทย์ตีความว่า (ราคาต่อตรม + ค่าเพิ่ม) * พื้นที่
-        let pricePerSqmTotal = basePrice + surcharge;
-        let pricePerPiece = pricePerSqmTotal * area;
-        
-        // 6. Line Total
-        let lineTotal = pricePerPiece * qty;
+        const glass = document.getElementById(`glass-${id}`).value;
+        const w = parseFloat(document.getElementById(`w-${id}`).value) || 0;
+        const h = parseFloat(document.getElementById(`h-${id}`).value) || 0;
+        const qty = parseFloat(document.getElementById(`qty-${id}`).value) || 1;
 
-        // Display Item Details
-        document.getElementById(`disp-area-${id}`).innerText = area.toFixed(2) + ' ตร.ม.';
-        document.getElementById(`disp-base-${id}`).innerText = basePrice.toLocaleString();
-        document.getElementById(`disp-sur-${id}`).innerText = (surcharge > 0) ? `+${surcharge}` : '0';
-        document.getElementById(`disp-total-${id}`).innerText = fmt(lineTotal);
+        // 1. Area (sqm)
+        const area = (w/1000) * (h/1000);
+        
+        // 2. Base Price
+        const basePrice = getBasePricePerSqm(model, type, style, glass);
+        
+        // 3. Surcharge
+        const surcharge = getSurcharge(color);
+        
+        // 4. Formula: (Base + Surcharge) * Area * Qty
+        const pricePerSqm = basePrice + surcharge;
+        const pricePerPiece = pricePerSqm * area;
+        const lineTotal = pricePerPiece * qty;
 
-        // Store Logic Data
-        const itemObj = items.find(i => i.id === id);
-        itemObj.lineTotal = lineTotal;
+        // Update UI Item
+        document.getElementById(`txt-area-${id}`).innerText = area.toFixed(2) + " ตร.ม.";
+        document.getElementById(`txt-base-${id}`).innerText = basePrice.toLocaleString();
+        document.getElementById(`txt-surch-${id}`).innerText = (surcharge>0 ? "+"+surcharge : "0");
+        document.getElementById(`txt-total-${id}`).innerText = fmt(lineTotal);
 
-        calculateTotal();
+        // Store for global total
+        const idx = items.findIndex(x => x.id === id);
+        if(idx > -1) items[idx].total = lineTotal;
+
+        recalcTotal();
     }
 
-    function calculateTotal() {
+    function recalcTotal() {
         // 1. Subtotal
-        let subtotal = items.reduce((sum, i) => sum + (i.lineTotal || 0), 0);
+        const subtotal = items.reduce((sum, item) => sum + (item.total || 0), 0);
         
         // 2. Discount
         let discount = parseFloat(document.getElementById('inp-discount').value) || 0;
-        if (discount > subtotal) {
-            discount = subtotal; // Cap discount
-            // document.getElementById('inp-discount').value = subtotal; // Optional: Force input change
-        }
+        if(discount > subtotal) discount = subtotal; // Cap discount
         
-        // 3. After Discount
-        let afterDisc = subtotal - discount;
-        
-        // 4. VAT 7%
-        let vat = afterDisc * 0.07;
-        
-        // 5. Grand Total
-        let grand = afterDisc + vat;
+        // 3. Logic
+        const afterDisc = subtotal - discount;
+        const vat = afterDisc * 0.07;
+        const grand = afterDisc + vat;
 
-        // Display Live Summary
+        // UI
         document.getElementById('live-subtotal').innerText = fmt(subtotal);
         document.getElementById('live-after-disc').innerText = fmt(afterDisc);
         document.getElementById('live-vat').innerText = fmt(vat);
@@ -583,31 +545,28 @@
         return { subtotal, discount, afterDisc, vat, grand };
     }
 
-    function fmt(n) {
-        return n.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
+    function fmt(n) { return n.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
     /* ===============================
-       4. PDF Generation (Page 4)
+       4. PDF GENERATOR
        =============================== */
-    function renderSummaryPDF() {
-        // Render Header Info
+    function renderPDFPreview() {
+        // Header
+        const d = new Date();
+        document.getElementById('pdf-date').innerText = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
         document.getElementById('pdf-cust-name').innerText = document.getElementById('inp-cust-name').value;
         document.getElementById('pdf-cust-addr').innerText = document.getElementById('inp-cust-addr').value;
         document.getElementById('pdf-cust-phone').innerText = document.getElementById('inp-cust-phone').value || '-';
         document.getElementById('pdf-sale-name').innerText = document.getElementById('inp-sale-name').value;
         document.getElementById('pdf-sale-phone').innerText = document.getElementById('inp-sale-phone').value || '-';
-        
-        const d = new Date();
-        document.getElementById('pdf-date').innerText = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
 
-        // Render Table Rows
-        const tbody = document.getElementById('pdf-table-body');
+        // Table Rows
+        const tbody = document.getElementById('pdf-tbody');
         tbody.innerHTML = '';
         
         items.forEach((item, index) => {
             const id = item.id;
-            const model = document.getElementById(`model-${id}`).value;
+            const model = document.getElementById(`model-${id}`).value.split('(')[0]; // Show short name
             const type = document.getElementById(`type-${id}`).value;
             const style = document.getElementById(`style-${id}`).value;
             const color = document.getElementById(`color-${id}`).value;
@@ -615,27 +574,24 @@
             const w = document.getElementById(`w-${id}`).value;
             const h = document.getElementById(`h-${id}`).value;
             const qty = document.getElementById(`qty-${id}`).value;
-
-            // Shorten Model Name for PDF to look cleaner
-            let shortModel = model.split('(')[0]; 
+            const total = item.total || 0;
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="text-center">${index + 1}</td>
+                <td class="text-center">${index+1}</td>
                 <td>
-                    <strong>${model}</strong><br>
-                    <small style="color:#555;">${type} - ${style}</small><br>
-                    <small style="color:#555;">สี: ${color} | กระจก: ${glass}</small>
+                    <strong>${model} ${type}</strong><br>
+                    <small style="color:#555;">${style} | ${color} | กระจก${glass}</small>
                 </td>
                 <td class="text-center">${w} x ${h}</td>
                 <td class="text-center">${qty}</td>
-                <td class="text-right">${fmt(item.lineTotal)}</td>
+                <td class="text-right">${fmt(total)}</td>
             `;
             tbody.appendChild(tr);
         });
 
-        // Render Footer Numbers
-        const t = calculateTotal();
+        // Totals
+        const t = recalcTotal();
         document.getElementById('pdf-subtotal').innerText = fmt(t.subtotal);
         document.getElementById('pdf-discount').innerText = fmt(t.discount);
         document.getElementById('pdf-after-disc').innerText = fmt(t.afterDisc);
@@ -644,35 +600,24 @@
     }
 
     function generatePDF() {
-        // Show Loading
         document.getElementById('loading').style.display = 'flex';
-        
         const element = document.getElementById('printable-area');
         const custName = document.getElementById('inp-cust-name').value || 'Customer';
-        
-        // Settings for html2pdf
+
         const opt = {
-            margin:       [10, 10, 10, 10], // top, left, bottom, right (mm)
-            filename:     `Quotation_${custName}.pdf`,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+            margin: [10, 10, 10, 10], // mm
+            filename: `Quotation_${custName}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, scrollY: 0 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
-        // Execution
-        html2pdf().set(opt).from(element).save()
-        .then(() => {
-            document.getElementById('loading').style.display = 'none';
-        })
-        .catch(err => {
-            alert("เกิดข้อผิดพลาดในการสร้าง PDF");
-            console.error(err);
+        html2pdf().set(opt).from(element).save().then(() => {
             document.getElementById('loading').style.display = 'none';
         });
     }
 
 </script>
-
 </body>
 </html>
